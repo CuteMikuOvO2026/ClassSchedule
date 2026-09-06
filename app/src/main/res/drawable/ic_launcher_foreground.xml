@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Minimal white calendar on the brand-blue adaptive-icon background. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Calendar body (outline) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:pathData="M34,46 C34,42.7 36.7,40 40,40 L68,40 C71.3,40 74,42.7 74,46 L74,74 C74,77.3 71.3,80 68,80 L40,80 C36.7,80 34,77.3 34,74 Z" />
+
+    <!-- Header separator -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:pathData="M34,51 L74,51" />
+
+    <!-- Vertical grid lines -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:pathData="M47.3,51 L47.3,80" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:pathData="M60.7,51 L60.7,80" />
+
+    <!-- Horizontal grid line -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:pathData="M34,65.5 L74,65.5" />
+
+    <!-- Binding rings -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M41,37 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M67,37 m-3.5,0 a3.5,3.5 0 1,1 7,0 a3.5,3.5 0 1,1 -7,0" />
+
+    <!-- "Today" filled cell -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36.5,55 L45,55 L45,63 L36.5,63 Z" />
+</vector>
