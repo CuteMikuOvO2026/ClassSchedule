@@ -13,3 +13,4 @@ release/
 .externalNativeBuild
 .cxx
 local.properties
+.workbuddy-ai/

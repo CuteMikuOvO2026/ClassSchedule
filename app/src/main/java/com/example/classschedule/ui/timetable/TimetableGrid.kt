@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -32,8 +30,13 @@ import com.example.classschedule.domain.ScheduleCalculator
 import com.example.classschedule.domain.model.Course
 import com.example.classschedule.domain.model.Semester
 import com.example.classschedule.ui.theme.courseBlockColors
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 private val dayLabels = listOf("一", "二", "三", "四", "五", "六", "日")
+
+/** Compact "M/d" label shown under each weekday in the grid header. */
+private val headerDateFormatter = DateTimeFormatter.ofPattern("M/d")
 
 /**
  * The weekly timetable grid: a fixed day header row over a vertically scrollable
@@ -53,8 +56,13 @@ fun TimetableGrid(
     val visibleCourses = courses.filter { ScheduleCalculator.isCourseInWeek(it, currentWeek) }
 
     val rowHeight = 60.dp
-    val headerHeight = 34.dp
+    val headerHeight = 42.dp
     val gutterWidth = 64.dp
+
+    // Calendar date of each column (Mon..Sun) for the week being displayed.
+    val weekDates = (1..7).map {
+        ScheduleCalculator.dateForWeekAndDay(semester.startDate, currentWeek, it)
+    }
 
     BoxWithConstraints(modifier = modifier) {
         val dayWidth = (maxWidth - gutterWidth) / 7
@@ -64,6 +72,7 @@ fun TimetableGrid(
                 gutterWidth = gutterWidth,
                 dayWidth = dayWidth,
                 headerHeight = headerHeight,
+                weekDates = weekDates,
                 todayDayOfWeek = todayDayOfWeek
             )
 
@@ -108,6 +117,7 @@ private fun DayHeaderRow(
     gutterWidth: Dp,
     dayWidth: Dp,
     headerHeight: Dp,
+    weekDates: List<LocalDate>,
     todayDayOfWeek: Int
 ) {
     Row(modifier = Modifier.height(headerHeight).fillMaxWidth()) {
@@ -126,12 +136,14 @@ private fun DayHeaderRow(
                         color = if (isToday) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onSurface
                     )
-                    if (isToday) {
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(4.dp)
-                                .background(MaterialTheme.colorScheme.primary, CircleShape)
+                    weekDates.getOrNull(day - 1)?.let { date ->
+                        Text(
+                            text = date.format(headerDateFormatter),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                            color = if (isToday) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
                         )
                     }
                 }

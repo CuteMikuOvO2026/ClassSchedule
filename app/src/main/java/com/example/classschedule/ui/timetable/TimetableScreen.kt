@@ -41,7 +41,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 private val dateRangeFormatter = DateTimeFormatter.ofPattern("M月d日")
-private val todayFormatter = DateTimeFormatter.ofPattern("M月d日")
 
 @Composable
 fun TimetableScreen(
@@ -99,19 +98,23 @@ private fun TimetableContent(
                     onPreviousWeek = onPreviousWeek,
                     onGoToCurrentWeek = onGoToCurrentWeek
                 )
-                TodayCard(semester = semester, courses = state.courses)
                 if (state.courses.isEmpty()) {
                     EmptyState(
                         message = "还没有课程，先添加第一门课吧",
                         onClick = onAddCourse
                     )
                 } else {
-                    val today = LocalDate.now().dayOfWeek.value
+                    // Highlight today's column only while the grid is actually showing
+                    // the week we are in; 0 means "no column highlighted".
+                    val today = LocalDate.now()
+                    val isShowingCurrentWeek =
+                        state.currentWeek == ScheduleCalculator.currentWeek(semester, today)
+                    val todayDayOfWeek = if (isShowingCurrentWeek) today.dayOfWeek.value else 0
                     TimetableGrid(
                         semester = semester,
                         courses = state.courses,
                         currentWeek = state.currentWeek,
-                        todayDayOfWeek = today,
+                        todayDayOfWeek = todayDayOfWeek,
                         onCourseClick = onCourseClick,
                         modifier = Modifier.weight(1f).fillMaxWidth()
                     )
@@ -150,63 +153,6 @@ private fun WeekNavigator(
         }
         IconButton(onClick = onNextWeek) { Text("›", style = MaterialTheme.typography.titleLarge) }
         TextButton(onClick = onGoToCurrentWeek) { Text("本周") }
-    }
-}
-
-@Composable
-private fun TodayCard(semester: Semester, courses: List<Course>) {
-    val today = LocalDate.now()
-    val todayWeek = ScheduleCalculator.weekOfDate(today, semester.startDate)
-    val todayDay = today.dayOfWeek.value
-    val inTerm = todayWeek in 1..semester.totalWeeks
-    val todaysCourses = if (inTerm) {
-        courses
-            .filter { ScheduleCalculator.isCourseInWeek(it, todayWeek) && todayDay in it.days }
-            .sortedBy { it.startPeriod }
-    } else emptyList()
-
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                text = "今天 ${today.format(todayFormatter)}",
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(Modifier.height(4.dp))
-            when {
-                todayWeek == 0 -> Text("还没开学", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                !inTerm -> Text("本学期已结束", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                todaysCourses.isEmpty() -> Text("今天没有课", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                else -> todaysCourses.forEach { course ->
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Text(
-                            text = "第${course.startPeriod}节",
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.width(56.dp),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = course.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.weight(1f),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        if (course.room.isNotBlank()) {
-                            Text(
-                                text = course.room,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 

@@ -3,7 +3,6 @@ package com.example.classschedule.data.local
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -22,15 +21,10 @@ class SettingsDataStore(private val context: Context) {
     val settings: Flow<Settings> = context.settingsDataStore.data.map { prefs ->
         Settings(
             currentSemesterId = prefs[KEY_CURRENT_SEMESTER_ID] ?: 1L,
-            currentWeek = prefs[KEY_CURRENT_WEEK] ?: 1,
             themeMode = runCatching { ThemeMode.valueOf(prefs[KEY_THEME_MODE] ?: "") }
                 .getOrDefault(ThemeMode.SYSTEM),
             dynamicColor = prefs[KEY_DYNAMIC_COLOR] ?: false
         )
-    }
-
-    suspend fun setCurrentWeek(week: Int) {
-        context.settingsDataStore.edit { it[KEY_CURRENT_WEEK] = week }
     }
 
     suspend fun setCurrentSemesterId(id: Long) {
@@ -47,7 +41,6 @@ class SettingsDataStore(private val context: Context) {
 
     private companion object {
         val KEY_CURRENT_SEMESTER_ID = longPreferencesKey("current_semester_id")
-        val KEY_CURRENT_WEEK = intPreferencesKey("current_week")
         val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
         val KEY_DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
     }

@@ -1,6 +1,7 @@
 package com.example.classschedule.domain
 
 import com.example.classschedule.domain.model.Course
+import com.example.classschedule.domain.model.Semester
 import com.example.classschedule.domain.model.WeekRule
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -21,6 +22,18 @@ object ScheduleCalculator {
         if (date.isBefore(semesterStart)) return 0
         val daysBetween = ChronoUnit.DAYS.between(semesterStart, date)
         return (daysBetween / 7).toInt() + 1
+    }
+
+    /**
+     * The teaching week that contains [today] for [semester], clamped into the
+     * semester's valid range (1-based) so the result is always safe to render.
+     *
+     * Lets the timetable open on "the week we are actually in" instead of
+     * restoring whichever week the user last browsed.
+     */
+    fun currentWeek(semester: Semester, today: LocalDate = LocalDate.now()): Int {
+        val totalWeeks = semester.totalWeeks.coerceAtLeast(1)
+        return weekOfDate(today, semester.startDate).coerceIn(1, totalWeeks)
     }
 
     /**
